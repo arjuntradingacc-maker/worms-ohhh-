@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff9ecf"/>
+      <stop offset="0.55" stop-color="#ff5c8a"/>
+      <stop offset="1" stop-color="#7c4dff"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7ff5e6"/>
+      <stop offset="1" stop-color="#2bb8a8"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9a6ff"/>
+      <stop offset="1" stop-color="#7c4dff"/>
+    </linearGradient>
+    <linearGradient id="yellow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe98a"/>
+      <stop offset="1" stop-color="#ffc233"/>
+    </linearGradient>
+    <radialGradient id="splashGlow" cx="0.5" cy="0.2" r="0.6">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- ambient bubbles -->
+  <circle cx="120" cy="130" r="10" fill="#ffffff" opacity="0.35"/>
+  <circle cx="90" cy="330" r="7" fill="#ffffff" opacity="0.3"/>
+  <circle cx="420" cy="120" r="8" fill="#ffffff" opacity="0.3"/>
+  <circle cx="430" cy="360" r="12" fill="#ffffff" opacity="0.3"/>
+
+  <!-- dramatic splash behind the bottle -->
+  <ellipse cx="256" cy="180" rx="200" ry="110" fill="url(#splashGlow)"/>
+  <path d="M256 60 C 200 90, 150 40, 130 90 C 175 95, 150 140, 190 150 C 200 110, 230 120, 256 90 C 282 120, 312 110, 322 150 C 362 140, 337 95, 382 90 C 362 40, 312 90, 256 60 Z"
+        fill="#ffffff" opacity="0.85"/>
+
+  <!-- bottle body: funky potion jar silhouette -->
+  <g>
+    <path d="M226 96 C226 84 234 78 246 78 L266 78 C278 78 286 84 286 96 L282 118
+             C340 132 366 190 356 260 C348 322 320 372 256 372 C192 372 164 322 156 260
+             C146 190 172 132 230 118 Z"
+          fill="#fff8ee" stroke="#c1177b" stroke-width="10"/>
+    <!-- knob -->
+    <circle cx="256" cy="60" r="20" fill="#fff8ee" stroke="#c1177b" stroke-width="10"/>
+    <rect x="240" y="72" width="32" height="14" fill="#fff8ee" stroke="#c1177b" stroke-width="8"/>
+  </g>
+
+  <!-- liquid bands, clipped to the bottle interior -->
+  <clipPath id="bottleClip">
+    <path d="M230 118 C172 132 146 190 156 260 C164 322 192 372 256 372 C320 372 348 322 356 260 C366 190 340 132 282 118 Z"/>
+  </clipPath>
+  <g clip-path="url(#bottleClip)">
+    <rect x="140" y="280" width="240" height="110" fill="url(#teal)"/>
+    <rect x="140" y="220" width="240" height="66" fill="url(#purple)"/>
+    <rect x="140" y="170" width="240" height="56" fill="url(#yellow)"/>
+    <!-- wavy liquid top -->
+    <path d="M140 172 Q 180 158 220 172 T 300 172 T 380 172 L380 190 L140 190 Z" fill="#ffffff" opacity="0.4"/>
+    <!-- tiny bubbles inside -->
+    <circle cx="200" cy="320" r="8" fill="#ffffff" opacity="0.45"/>
+    <circle cx="300" cy="340" r="6" fill="#ffffff" opacity="0.4"/>
+    <circle cx="270" cy="250" r="5" fill="#ffffff" opacity="0.4"/>
+    <circle cx="190" cy="200" r="5" fill="#ffffff" opacity="0.4"/>
+  </g>
+
+  <!-- glass gloss overlay -->
+  <path d="M230 118 C172 132 146 190 156 260 C164 322 192 372 256 372 C320 372 348 322 356 260 C366 190 340 132 282 118 Z"
+        fill="url(#glass)"/>
+  <path d="M190 150 C176 190 172 250 190 320" stroke="#ffffff" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.55"/>
+
+  <!-- bold outline -->
+  <path d="M230 118 C172 132 146 190 156 260 C164 322 192 372 256 372 C320 372 348 322 356 260 C366 190 340 132 282 118"
+        fill="none" stroke="#c1177b" stroke-width="10" stroke-linejoin="round"/>
+</svg>

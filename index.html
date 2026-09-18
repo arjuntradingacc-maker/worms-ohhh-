@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Match the Liquid</title>
+<meta name="description" content="Pour it. Match it. Pop it! An original candy-colored liquid-sorting puzzle game." />
+<meta name="theme-color" content="#ff6fa5" />
+<link rel="icon" href="public/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="public/icon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+<div id="app">
+
+  <section id="screen-splash" class="screen active">
+    <div class="splash-bg"></div>
+    <div class="floaty-decor" aria-hidden="true"></div>
+    <div class="logo-wrap">
+      <h1 class="logo">MATCH<br/>THE LIQUID</h1>
+      <p class="tagline">Pour it. Match it. Pop it!</p>
+    </div>
+    <canvas id="mascot-splash-canvas" width="200" height="200" class="mascot-canvas"></canvas>
+    <button id="btn-tap-start" class="btn btn-primary btn-huge btn-glow">TAP TO PLAY</button>
+  </section>
+
+  <section id="screen-home" class="screen">
+    <div class="topbar">
+      <div class="coin-pill" data-coin-counter>
+        <span class="coin-icon">🪙</span><span class="coin-value">0</span>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" data-open-collection aria-label="Liquid FX Collection">✦</button>
+        <button class="icon-btn" data-open-settings aria-label="Settings">⚙</button>
+      </div>
+    </div>
+    <div class="home-bubbles" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="home-center">
+      <h1 class="logo small">MATCH<br/>THE LIQUID</h1>
+      <p class="tagline home-tagline">Pour it. Match it. Pop it!</p>
+      <div class="mascot-stage">
+        <div class="mascot-puddle"></div>
+        <canvas id="mascot-home-canvas" width="200" height="200" class="mascot-canvas"></canvas>
+      </div>
+      <button id="btn-play" class="btn btn-primary btn-huge btn-glow">PLAY</button>
+    </div>
+    <div class="world-card-row" id="world-row"></div>
+  </section>
+
+  <section id="screen-levels" class="screen">
+    <div class="topbar">
+      <button class="icon-btn" data-back-to-home aria-label="Back">←</button>
+      <div class="world-title-wrap">
+        <h2 id="world-title">World</h2>
+        <p id="world-tagline"></p>
+      </div>
+      <div class="coin-pill" data-coin-counter>
+        <span class="coin-icon">🪙</span><span class="coin-value">0</span>
+      </div>
+    </div>
+    <div class="level-grid" id="level-grid"></div>
+  </section>
+
+  <section id="screen-game" class="screen">
+    <div class="game-hud">
+      <button class="icon-btn" data-back-to-levels aria-label="Back">←</button>
+      <div class="hud-center">
+        <span id="level-label" class="level-label">Level</span>
+        <span id="combo-badge" class="combo-badge hidden">LIQUID COMBO ×2</span>
+      </div>
+      <div class="hud-right">
+        <span id="move-count" class="move-count">0 moves</span>
+      </div>
+    </div>
+    <canvas id="game-canvas"></canvas>
+    <canvas id="liqi-hud-canvas" width="76" height="76" class="liqi-hud"></canvas>
+    <div class="game-controls">
+      <button id="btn-undo" class="btn btn-pill">↺ Undo</button>
+      <button id="btn-reset" class="btn btn-pill">⟲ Reset</button>
+    </div>
+  </section>
+
+  <div id="overlay-complete" class="overlay hidden">
+    <div class="complete-panel">
+      <h2 class="complete-title">LEVEL<br/>COMPLETE!</h2>
+      <div class="stars-row" id="stars-row">
+        <span class="star" data-star>★</span>
+        <span class="star" data-star>★</span>
+        <span class="star" data-star>★</span>
+      </div>
+      <div class="coins-earned"><span class="coin-icon">🪙</span>+<span id="coins-earned-count">0</span></div>
+      <button id="btn-next-level" class="btn btn-primary btn-huge breathing">NEXT LEVEL</button>
+      <button id="btn-replay-level" class="btn btn-secondary">Replay</button>
+    </div>
+  </div>
+
+  <div id="overlay-settings" class="overlay hidden">
+    <div class="settings-panel">
+      <h2>Settings</h2>
+      <label class="toggle-row"><span>Sound Effects</span><input type="checkbox" id="opt-sound" /><span class="toggle-track"></span></label>
+      <label class="toggle-row"><span>Music</span><input type="checkbox" id="opt-music" /><span class="toggle-track"></span></label>
+      <label class="toggle-row"><span>Haptics</span><input type="checkbox" id="opt-haptics" /><span class="toggle-track"></span></label>
+      <hr class="settings-divider" />
+      <label class="toggle-row"><span>Color-Blind Mode</span><input type="checkbox" id="opt-colorblind" /><span class="toggle-track"></span></label>
+      <label class="toggle-row"><span>High Contrast</span><input type="checkbox" id="opt-highcontrast" /><span class="toggle-track"></span></label>
+      <label class="toggle-row"><span>Reduced Motion</span><input type="checkbox" id="opt-reducedmotion" /><span class="toggle-track"></span></label>
+      <button id="btn-reset-progress" class="btn btn-danger-outline">Reset Progress</button>
+      <button id="btn-close-settings" class="btn btn-primary">Done</button>
+    </div>
+  </div>
+
+  <div id="overlay-collection" class="overlay hidden">
+    <div class="settings-panel">
+      <h2>Liquid FX Collection</h2>
+      <p class="collection-hint">Unlocked by beating each world's final level.</p>
+      <div class="fx-grid" id="fx-grid"></div>
+      <button id="btn-close-collection" class="btn btn-primary">Done</button>
+    </div>
+  </div>
+
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
