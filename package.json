@@ -1,0 +1,12 @@
+{
+  "name": "match-the-liquid",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Match the Liquid — Pour it. Match it. Pop it! An original candy-colored liquid-sorting puzzle game.",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "regen-levels": "node tools/precompute-levels.mjs"
+  },
+  "license": "UNLICENSED"
+}
