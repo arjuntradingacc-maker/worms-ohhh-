@@ -1,0 +1,11 @@
+{
+  "name": "lumenloop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LumenLoop — a neon bioluminescent multiplayer arena arcade game. Flow. Grow. Outplay.",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "license": "UNLICENSED"
+}
