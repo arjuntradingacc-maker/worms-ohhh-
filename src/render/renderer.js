@@ -35,12 +35,29 @@ function botHue(id) {
 export class Renderer {
   constructor(canvas) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
+    this.ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
     this.dpr = Math.min(2, window.devicePixelRatio || 1);
     this._effects = [];
     this._bgSeed = Math.random() * 1000;
     this._energyColors = ENERGY_COLOR;
+    this._bgParticles = this._buildBgParticles(QUALITY.ultra.bgParticles);
+    this._bgGradient = null;
     this.resize();
+  }
+
+  // Background starfield positions are pseudo-random but static per particle
+  // (only their scroll offset animates), so they're computed once instead of
+  // re-deriving two Math.sin() calls per particle, every particle, every
+  // frame.
+  _buildBgParticles(count) {
+    const particles = [];
+    for (let i = 0; i < count; i++) {
+      const seed = i * 12.9898 + this._bgSeed;
+      const fx = ((Math.sin(seed) * 43758.5453) % 1 + 1) % 1;
+      const fy = ((Math.sin(seed * 1.7) * 12543.231) % 1 + 1) % 1;
+      particles.push({ fx, fy, r: 0.6 + (i % 3) * 0.5, alpha: 0.25 + 0.35 * ((i % 7) / 7), drift: i % 5 });
+    }
+    return particles;
   }
 
   resize() {
@@ -50,6 +67,7 @@ export class Renderer {
     this.canvas.style.width = w + 'px';
     this.canvas.style.height = h + 'px';
     this.w = w; this.h = h;
+    this._bgGradient = null;
   }
 
   _q(quality) { return QUALITY[quality] || QUALITY.high; }
@@ -122,11 +140,14 @@ export class Renderer {
   }
 
   _drawBackground(ctx, w, h, cam, quality, reducedMotion) {
-    const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.75);
-    grad.addColorStop(0, '#0d1230');
-    grad.addColorStop(0.55, '#080a1e');
-    grad.addColorStop(1, '#030410');
-    ctx.fillStyle = grad;
+    if (!this._bgGradient) {
+      const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.75);
+      grad.addColorStop(0, '#0d1230');
+      grad.addColorStop(0.55, '#080a1e');
+      grad.addColorStop(1, '#030410');
+      this._bgGradient = grad;
+    }
+    ctx.fillStyle = this._bgGradient;
     ctx.fillRect(0, 0, w, h);
 
     const t = reducedMotion ? 0 : performance.now() * 0.00002;
@@ -134,15 +155,12 @@ export class Renderer {
     const n = quality.bgParticles;
     const parX = cam.x * 0.04, parY = cam.y * 0.04;
     for (let i = 0; i < n; i++) {
-      const seed = i * 12.9898 + this._bgSeed;
-      const fx = ((Math.sin(seed) * 43758.5453) % 1 + 1) % 1;
-      const fy = ((Math.sin(seed * 1.7) * 12543.231) % 1 + 1) % 1;
-      const x = ((fx * w * 3 - parX + t * (i % 5)) % w + w) % w;
-      const y = ((fy * h * 3 - parY) % h + h) % h;
-      const r = 0.6 + (i % 3) * 0.5;
-      ctx.globalAlpha = 0.25 + 0.35 * ((i % 7) / 7);
+      const p = this._bgParticles[i];
+      const x = ((p.fx * w * 3 - parX + t * p.drift) % w + w) % w;
+      const y = ((p.fy * h * 3 - parY) % h + h) % h;
+      ctx.globalAlpha = p.alpha;
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.arc(x, y, p.r, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.globalAlpha = 1;

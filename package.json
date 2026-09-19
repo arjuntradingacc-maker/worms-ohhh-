@@ -5,7 +5,17 @@
   "description": "LumenLoop — a neon bioluminescent multiplayer arena arcade game. Flow. Grow. Outplay.",
   "scripts": {
     "dev": "node server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build:www": "node scripts/build-www.js",
+    "android:sync": "npm run build:www && npx cap sync android",
+    "android:build": "npm run android:sync && cd android && ./gradlew assembleRelease"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2"
+  }
 }

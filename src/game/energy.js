@@ -68,7 +68,9 @@ export class EnergyField {
     p.alive = true;
     p.phase = Math.random() * Math.PI * 2;
     p.bob = rand(0.5, 1.2);
+    p.listIndex = this.particles.length;
     this.particles.push(p);
+    this._addToGrid(p);
     return p;
   }
 
@@ -114,17 +116,31 @@ export class EnergyField {
     }
 
     for (const p of this.particles) p.phase += dt * p.bob;
-    this._rebuildGrid();
   }
 
-  _rebuildGrid() {
-    this._grid.clear();
-    for (const p of this.particles) {
-      const key = this._cellKey(p.x, p.y);
-      let bucket = this._grid.get(key);
-      if (!bucket) this._grid.set(key, (bucket = []));
-      bucket.push(p);
+  // Particles never move once spawned, so the spatial grid is maintained
+  // incrementally on spawn/remove rather than rebuilt from scratch every
+  // frame (this used to reallocate hundreds of bucket arrays per frame).
+  _addToGrid(p) {
+    const key = this._cellKey(p.x, p.y);
+    let bucket = this._grid.get(key);
+    if (!bucket) this._grid.set(key, (bucket = []));
+    p._cellKey = key;
+    p._cellIndex = bucket.length;
+    bucket.push(p);
+  }
+
+  _removeFromGrid(p) {
+    const bucket = this._grid.get(p._cellKey);
+    if (!bucket) return;
+    const last = bucket.length - 1;
+    const idx = p._cellIndex;
+    if (idx !== last) {
+      const moved = bucket[last];
+      bucket[idx] = moved;
+      moved._cellIndex = idx;
     }
+    bucket.pop();
   }
 
   _cellKey(x, y) {
@@ -150,11 +166,17 @@ export class EnergyField {
   }
 
   remove(p) {
-    const idx = this.particles.indexOf(p);
-    if (idx >= 0) {
-      this.particles.splice(idx, 1);
-      p.alive = false;
-      this.pool.push(p);
+    if (!p.alive) return;
+    const idx = p.listIndex;
+    const last = this.particles.length - 1;
+    if (idx !== last) {
+      const moved = this.particles[last];
+      this.particles[idx] = moved;
+      moved.listIndex = idx;
     }
+    this.particles.pop();
+    this._removeFromGrid(p);
+    p.alive = false;
+    this.pool.push(p);
   }
 }

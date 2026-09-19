@@ -64,7 +64,12 @@ export function updateHUD(match) {
   if (match.player.ability) {
     const a = match.player.ability;
     const def = ABILITY_DEFS[a.id];
-    const pct = a.active ? 0 : Math.round((a.cooldownRemaining / def.cooldown) * 100);
+    // cooldownRemaining ticks down from the moment the ability activates
+    // (concurrently with its active-effect window, see abilities.js), so it
+    // alone always reflects "time until usable again" — no need to special
+    // case `active`, which used to make the ring falsely read 0% while the
+    // ability was still resolving.
+    const pct = Math.round((a.cooldownRemaining / def.cooldown) * 100);
     els.abilityCd.style.setProperty('--pct', `${pct}%`);
     els.abilityBtn.style.opacity = pct > 0 ? '0.55' : '1';
   }

@@ -89,12 +89,21 @@ export const CATALOG = {
   ],
 };
 
+let _allItemsCache = null;
 export function allItems() {
-  return Object.values(CATALOG).flat();
+  if (!_allItemsCache) _allItemsCache = Object.values(CATALOG).flat();
+  return _allItemsCache;
 }
 
+// getItem() is called every frame per rendered Lumen (to resolve its equipped
+// theme), so it's backed by a Map instead of a linear find() over the catalog.
+let _itemById = null;
 export function getItem(id) {
-  return allItems().find((i) => i.id === id);
+  if (!_itemById) {
+    _itemById = new Map();
+    for (const it of allItems()) _itemById.set(it.id, it);
+  }
+  return _itemById.get(id);
 }
 
 export function isUnlocked(profile, itemDef) {
