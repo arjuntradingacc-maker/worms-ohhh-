@@ -25,6 +25,58 @@ static file server works — `npx serve`, `python3 -m http.server`, etc. — a
 server is required because the game loads ES modules, which browsers block
 over `file://`.)
 
+## Android build (APK)
+
+The game is also wrapped as a native Android app via
+[Capacitor](https://capacitorjs.com) — a thin WebView shell around the exact
+same `index.html`/`src`/`styles` used in the browser. No game code is
+different between the two; `android/` just packages it.
+
+Requirements: JDK 17+, and the Android SDK (`platform-tools`,
+`platforms;android-36`, `build-tools;36.0.0`) with `ANDROID_HOME` set.
+
+```
+npm install                 # pulls in @capacitor/core, @capacitor/cli, @capacitor/android
+npm run android:sync        # copies index.html/styles/src/public into www/, syncs into android/
+```
+
+To build a release APK you need a signing keystore (one isn't committed —
+see below), referenced via `android/keystore.properties`:
+
+```
+# android/keystore.properties (gitignored — create your own)
+storeFile=lumenloop-release.keystore
+storePassword=<your password>
+keyAlias=lumenloop
+keyPassword=<your password>
+```
+
+```
+keytool -genkeypair -v -keystore android/app/lumenloop-release.keystore \
+  -alias lumenloop -keyalg RSA -keysize 2048 -validity 10950
+
+cd android && ./gradlew assembleRelease
+# -> android/app/build/outputs/apk/release/app-release.apk
+```
+
+The release build has `minifyEnabled`/`shrinkResources` on — safe here since
+the game never calls into the Capacitor plugin bridge (it only uses standard
+web APIs: Canvas, WebAudio, `navigator.vibrate`, `localStorage`), so there's
+no native reflection path that shrinking could break.
+
+The app icon and splash screen (every legacy + adaptive-icon density) are
+generated from `public/icon.svg`, not the Capacitor template defaults.
+
+**A note on testing the APK**: it was verified by building, signing, and
+zip-aligning correctly (`apksigner verify`, `zipalign -c`), and by extracting
+its bundled assets to confirm they match the latest source. The game logic
+inside it was exhaustively tested in a real Chromium browser (the same
+rendering engine family Android's WebView uses) — every screen, every
+button, both joystick modes, every settings toggle. It was **not** booted on
+an actual Android device or emulator in this environment, which has no KVM
+support to run one. Do a quick real-device install as a sanity check before
+relying on it.
+
 ## Controls
 
 - **Move**: drag anywhere on screen. Your Lumen always flows forward; you
@@ -116,6 +168,10 @@ src/
                        lifecycle (matchmaking → countdown → play → result),
                        and reward/XP/achievement bookkeeping after a match.
 server.js              Zero-dependency static file server for local dev.
+scripts/build-www.js   Copies the static files into www/ for Capacitor.
+www/                   Build output (gitignored) — what Capacitor packages.
+android/               Generated Capacitor native project (the APK wrapper).
+capacitor.config.json  Capacitor app id/name/web-dir config.
 ```
 
 The simulation (`src/game`) never touches the DOM or canvas, and the
